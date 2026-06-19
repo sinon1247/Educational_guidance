@@ -1,0 +1,84 @@
+{
+  "name": "School",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "School name"
+    },
+    "province": {
+      "type": "string",
+      "description": "Province where the school is located"
+    },
+    "district": {
+      "type": "string",
+      "description": "District within the province"
+    },
+    "academic_year": {
+      "type": "string",
+      "description": "Academic year (e.g., B.E. 2568 / 2025)",
+      "default": "B.E. 2568 / 2025"
+    },
+    "phone": {
+      "type": "string",
+      "description": "School phone number"
+    },
+    "email": {
+      "type": "string",
+      "description": "School email address"
+    },
+    "address": {
+      "type": "string",
+      "description": "Full street address of the school"
+    },
+    "latitude": {
+      "type": "number",
+      "description": "Latitude coordinate for map display"
+    },
+    "longitude": {
+      "type": "number",
+      "description": "Longitude coordinate for map display"
+    },
+    "grade_7": {
+      "type": "number",
+      "description": "Number of students in Grade 7 (Mathayom 1)",
+      "default": 0
+    },
+    "grade_8": {
+      "type": "number",
+      "description": "Number of students in Grade 8 (Mathayom 2)",
+      "default": 0
+    },
+    "grade_9": {
+      "type": "number",
+      "description": "Number of students in Grade 9 (Mathayom 3)",
+      "default": 0
+    },
+    "grade_10": {
+      "type": "number",
+      "description": "Number of students in Grade 10 (Mathayom 4)",
+      "default": 0
+    },
+    "grade_11": {
+      "type": "number",
+      "description": "Number of students in Grade 11 (Mathayom 5)",
+      "default": 0
+    },
+    "grade_12": {
+      "type": "number",
+      "description": "Number of students in Grade 12 (Mathayom 6)",
+      "default": 0
+    },
+    "total_students": {
+      "type": "number",
+      "description": "Total number of students across all grades",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "province",
+    "district",
+    "academic_year"
+  ]
+}
