@@ -1,0 +1,29 @@
+# Project Overview: Educational Guidance Web Application
+
+## Purpose
+This is a web application designed to provide educational guidance. Its main goal is to display information about various schools, specifically focusing on the number of students across different grades (Grade 7 to Grade 12) and total student population. This data is intended to help users make informed decisions regarding educational outreach, planning, or school selection.
+
+## Current State
+The project is fully functional and ready for production use. The UI, routing, and filtering logic are fully operational. It currently relies on static data imported from a local file, and the user intends to keep it this way (no need for a backend API). The only remaining step is to replace the mock data with actual data.
+
+## Tech Stack
+- **Framework:** React 18 with Vite
+- **Styling:** Tailwind CSS
+- **Routing:** React Router v6
+- **UI Components:** Radix UI primitives, Lucide React (for icons)
+- **Data Fetching/State:** TanStack React Query (setup prepared for future API integration)
+- **Other tools:** Recharts (likely for data visualization), React Leaflet (for maps, based on latitude/longitude in data)
+
+## Key Architecture & Structure
+- `/src/pages/Home.jsx`: The main entry point and orchestrator for the application's view. It manages the state for filtering schools by academic year, province, and district.
+- `/src/data/schools.js`: The current mock data source. It exports an array of school objects containing properties like `id`, `name`, `province`, `district`, `academic_year`, contact info, coordinates (`latitude`, `longitude`), and student counts (`grade_7` through `grade_12`, and `total_students`).
+- `/src/components/guidance/`: Contains the core UI components for this feature:
+  - `HeroSearch`: The top hero section, likely containing a search bar.
+  - `FilterDock`: The interface allowing users to filter the school list by year, province, and district.
+  - `DataGrid`: The component responsible for displaying the filtered list or grid of schools.
+  - `SchoolDrawer`: A slide-out panel (drawer) that displays detailed information when a specific school is selected.
+
+## Important Notes for Future Development
+- **Data Integration:** The application does NOT use a backend API. Data is loaded statically from `src/data/schools.js`. To update the data, simply replace the mock data in this file with the real data following the established structure.
+- **Filtering Logic:** The filtering logic in `Home.jsx` is robust and handles cascading dependencies (e.g., available districts depend on the selected province). Ensure any data structure changes accommodate this logic.
+- **Aesthetics:** The project uses Tailwind CSS and Radix UI to maintain a modern, responsive, and accessible design. Keep this in mind when adding new components.

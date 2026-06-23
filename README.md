@@ -1,6 +1,6 @@
 # Educational Guidance
 
-เว็บข้อมูลโรงเรียนเพื่อการแนะแนว สร้างด้วย Vite + React และรันแบบ static site ได้โดยไม่ต้องพึ่ง Base44 runtime
+เว็บข้อมูลโรงเรียนเพื่อการแนะแนว สร้างด้วย Vite + React และรันแบบ static site
 
 ## Development
 
