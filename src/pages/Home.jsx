@@ -32,6 +32,7 @@ export default function Home() {
   const [selectedYear, setSelectedYear] = useState("2568");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
 
   useEffect(() => {
     // คำนวณ total_students ให้ทุกโรงเรียน แล้วกรองเฉพาะที่มีนักเรียน > 0
@@ -68,6 +69,18 @@ export default function Home() {
     ].sort();
   }, [filteredByYear, selectedProvince]);
 
+  const subDistricts = useMemo(() => {
+    if (!selectedDistrict) return [];
+    return [
+      ...new Set(
+        filteredByYear
+          .filter((s) => s.province === selectedProvince && s.district === selectedDistrict)
+          .map((s) => s.sub_district)
+          .filter(Boolean)
+      ),
+    ].sort();
+  }, [filteredByYear, selectedProvince, selectedDistrict]);
+
   const filteredSchools = useMemo(() => {
     let result = filteredByYear;
     if (selectedProvince) {
@@ -76,12 +89,21 @@ export default function Home() {
     if (selectedDistrict) {
       result = result.filter((s) => s.district === selectedDistrict);
     }
+    if (selectedSubDistrict) {
+      result = result.filter((s) => s.sub_district === selectedSubDistrict);
+    }
     return result;
-  }, [filteredByYear, selectedProvince, selectedDistrict]);
+  }, [filteredByYear, selectedProvince, selectedDistrict, selectedSubDistrict]);
 
   const handleProvinceChange = (val) => {
     setSelectedProvince(val);
     setSelectedDistrict("");
+    setSelectedSubDistrict("");
+  };
+
+  const handleDistrictChange = (val) => {
+    setSelectedDistrict(val);
+    setSelectedSubDistrict("");
   };
 
   if (loading) {
@@ -113,7 +135,10 @@ export default function Home() {
         onProvinceChange={handleProvinceChange}
         districts={districts}
         selectedDistrict={selectedDistrict}
-        onDistrictChange={setSelectedDistrict}
+        onDistrictChange={handleDistrictChange}
+        subDistricts={subDistricts}
+        selectedSubDistrict={selectedSubDistrict}
+        onSubDistrictChange={setSelectedSubDistrict}
       />
       <DataGrid
         schools={filteredSchools}

@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, MapPin, Building2 } from "lucide-react";
+import { Calendar, MapPin, Building2, Landmark } from "lucide-react";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -26,6 +26,9 @@ export default function FilterDock({
   districts,
   selectedDistrict,
   onDistrictChange,
+  subDistricts,
+  selectedSubDistrict,
+  onSubDistrictChange,
 }) {
   return (
     <motion.div
@@ -34,7 +37,7 @@ export default function FilterDock({
       transition={{ duration: 0.6, ease: EASE, delay: 0.3 }}
       className="w-full max-w-6xl mx-auto px-6 md:px-16 py-10"
     >
-      <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-end">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-end flex-wrap">
         {/* Academic Year */}
         <FilterPill label="ปีการศึกษา" icon={Calendar}>
           <select
@@ -86,6 +89,33 @@ export default function FilterDock({
                   <option value="">ทุกอำเภอ</option>
                   {districts.map((d) => (
                     <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </FilterPill>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Sub-district - appears when district selected */}
+        <AnimatePresence>
+          {selectedDistrict && subDistricts && subDistricts.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: -20, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: "auto" }}
+              exit={{ opacity: 0, x: -20, width: 0 }}
+              transition={{ duration: 0.4, ease: EASE }}
+            >
+              <FilterPill label="ตำบล" icon={Landmark}>
+                <select
+                  value={selectedSubDistrict}
+                  onChange={(e) => onSubDistrictChange(e.target.value)}
+                  className="h-11 px-4 bg-card border-[0.5px] border-border rounded-sm font-body text-sm text-foreground focus:outline-none focus:border-accent transition-colors duration-300 cursor-pointer min-w-[200px]"
+                  tabIndex={4}
+                  aria-label="เลือกตำบล"
+                >
+                  <option value="">ทุกตำบล</option>
+                  {subDistricts.map((sd) => (
+                    <option key={sd} value={sd}>{sd}</option>
                   ))}
                 </select>
               </FilterPill>
