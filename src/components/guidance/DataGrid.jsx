@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDown, ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowUpDown, ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
 
 const EASE = [0.22, 1, 0.36, 1];
+const PAGE_SIZE = 50;
 
 const GRADE_COLS = [
   { key: "grade_7_total",  label: "ม.1",   fullLabel: "มัธยมศึกษาปีที่ 1" },
@@ -20,6 +21,7 @@ export default function DataGrid({ schools, onSelectSchool }) {
   const [sortKey, setSortKey] = useState("total_students");
   const [sortDir, setSortDir] = useState("desc");
   const [hoveredCol, setHoveredCol] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -30,11 +32,24 @@ export default function DataGrid({ schools, onSelectSchool }) {
     }
   };
 
+  // รีเซ็ต visibleCount เมื่อข้อมูลเปลี่ยน (เช่น กดฟิลเตอร์ใหม่)
+  React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [schools]);
+
   const sorted = [...schools].sort((a, b) => {
     const av = a[sortKey] || 0;
     const bv = b[sortKey] || 0;
     return sortDir === "desc" ? bv - av : av - bv;
   });
+
+  const visible = sorted.slice(0, visibleCount);
+  const hasMore = visibleCount < sorted.length;
+  const remaining = sorted.length - visibleCount;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, sorted.length));
+  }, [sorted.length]);
 
   const SortIcon = ({ col }) => {
     if (sortKey !== col) return <ArrowUpDown className="w-3 h-3 opacity-30" />;
@@ -57,6 +72,11 @@ export default function DataGrid({ schools, onSelectSchool }) {
       <div className="flex items-center justify-between mb-8">
         <p className="text-xs font-body font-medium tracking-[0.1em] uppercase text-muted-foreground">
           พบ {schools.length.toLocaleString()} โรงเรียน
+          {hasMore && (
+            <span className="ml-1 text-accent">
+              (แสดง {visibleCount.toLocaleString()} รายการ)
+            </span>
+          )}
         </p>
         <p className="text-xs font-body text-muted-foreground hidden md:block">
           คลิกหัวตารางเพื่อเรียงลำดับ | คลิกชื่อโรงเรียนเพื่อดูรายละเอียด
@@ -107,7 +127,7 @@ export default function DataGrid({ schools, onSelectSchool }) {
           </thead>
           <tbody>
             <AnimatePresence mode="popLayout">
-              {sorted.map((school) => (
+              {visible.map((school) => (
                 <motion.tr
                   key={school.id}
                   layout
@@ -150,6 +170,19 @@ export default function DataGrid({ schools, onSelectSchool }) {
           </tbody>
         </table>
       </div>
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={loadMore}
+            className="flex items-center gap-2 px-8 py-3 bg-card border-[0.5px] border-border rounded-sm font-body text-sm text-muted-foreground hover:text-accent hover:border-accent transition-all duration-300 group"
+          >
+            <span>แสดงเพิ่มอีก {Math.min(PAGE_SIZE, remaining).toLocaleString()} โรงเรียน</span>
+            <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform duration-300" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

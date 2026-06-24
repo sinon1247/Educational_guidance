@@ -8,6 +8,21 @@ import Footer from "@/components/guidance/Footer";
 
 const HERO_IMG = "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=2400&q=85";
 
+/** คำนวณจำนวนนักเรียนรวมจากทุกชั้นปี */
+function calcTotal(s) {
+  return (
+    (s.grade_7_total || 0) +
+    (s.grade_8_total || 0) +
+    (s.grade_9_total || 0) +
+    (s.grade_10_total || 0) +
+    (s.grade_11_total || 0) +
+    (s.grade_12_total || 0) +
+    (s.voc_1_total || 0) +
+    (s.voc_2_total || 0) +
+    (s.voc_3_total || 0)
+  );
+}
+
 export default function Home() {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +34,11 @@ export default function Home() {
   const [selectedDistrict, setSelectedDistrict] = useState("");
 
   useEffect(() => {
-    setSchools(schoolData);
+    // คำนวณ total_students ให้ทุกโรงเรียน แล้วกรองเฉพาะที่มีนักเรียน > 0
+    const enriched = schoolData
+      .map((s) => ({ ...s, total_students: calcTotal(s) }))
+      .filter((s) => s.total_students > 0);
+    setSchools(enriched);
     setLoading(false);
   }, []);
 

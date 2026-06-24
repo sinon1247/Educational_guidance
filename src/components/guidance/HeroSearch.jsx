@@ -108,7 +108,7 @@ export default function HeroSearch({ schools, onSelectSchool, heroImage }) {
                         {school.name}
                       </span>
                       <span className="block text-xs text-muted-foreground mt-0.5 font-body tracking-wide">
-                        {school.district}, {school.province} | {school.total_students.toLocaleString()} คน
+                        {school.district}, {school.province} | {(school.total_students || 0).toLocaleString()} คน
                       </span>
                     </button>
                   ))
