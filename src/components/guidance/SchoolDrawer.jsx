@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, GraduationCap, Phone, Mail, MapPin } from "lucide-react";
+import { X, GraduationCap, Phone, Mail, MapPin, ExternalLink } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
@@ -8,15 +8,15 @@ import L from "leaflet";
 const EASE = [0.22, 1, 0.36, 1];
 
 const GRADE_MAP = [
-  { key: "grade_7_total",  label: "ม.1",    full: "มัธยมศึกษาปีที่ 1",  color: "hsl(var(--chart-1))" },
-  { key: "grade_8_total",  label: "ม.2",    full: "มัธยมศึกษาปีที่ 2",  color: "hsl(var(--chart-1))" },
-  { key: "grade_9_total",  label: "ม.3",    full: "มัธยมศึกษาปีที่ 3",  color: "hsl(var(--chart-1))" },
-  { key: "grade_10_total", label: "ม.4",    full: "มัธยมศึกษาปีที่ 4",  color: "hsl(var(--chart-1))" },
-  { key: "grade_11_total", label: "ม.5",    full: "มัธยมศึกษาปีที่ 5",  color: "hsl(var(--chart-1))" },
-  { key: "grade_12_total", label: "ม.6",    full: "มัธยมศึกษาปีที่ 6",  color: "hsl(var(--chart-1))" },
-  { key: "voc_1_total",    label: "ปวช.1",  full: "ประกาศนียบัตรวิชาชีพปีที่ 1", color: "hsl(var(--chart-2))" },
-  { key: "voc_2_total",    label: "ปวช.2",  full: "ประกาศนียบัตรวิชาชีพปีที่ 2", color: "hsl(var(--chart-2))" },
-  { key: "voc_3_total",    label: "ปวช.3",  full: "ประกาศนียบัตรวิชาชีพปีที่ 3", color: "hsl(var(--chart-2))" },
+  { key: "grade_7_total",  roomKey: "grade_7_rooms",  label: "ม.1",    full: "มัธยมศึกษาปีที่ 1",  color: "hsl(var(--chart-1))" },
+  { key: "grade_8_total",  roomKey: "grade_8_rooms",  label: "ม.2",    full: "มัธยมศึกษาปีที่ 2",  color: "hsl(var(--chart-1))" },
+  { key: "grade_9_total",  roomKey: "grade_9_rooms",  label: "ม.3",    full: "มัธยมศึกษาปีที่ 3",  color: "hsl(var(--chart-1))" },
+  { key: "grade_10_total", roomKey: "grade_10_rooms", label: "ม.4",    full: "มัธยมศึกษาปีที่ 4",  color: "hsl(var(--chart-1))" },
+  { key: "grade_11_total", roomKey: "grade_11_rooms", label: "ม.5",    full: "มัธยมศึกษาปีที่ 5",  color: "hsl(var(--chart-1))" },
+  { key: "grade_12_total", roomKey: "grade_12_rooms", label: "ม.6",    full: "มัธยมศึกษาปีที่ 6",  color: "hsl(var(--chart-1))" },
+  { key: "voc_1_total",    roomKey: "voc_1_rooms",    label: "ปวช.1",  full: "ประกาศนียบัตรวิชาชีพปีที่ 1", color: "hsl(var(--chart-2))" },
+  { key: "voc_2_total",    roomKey: "voc_2_rooms",    label: "ปวช.2",  full: "ประกาศนียบัตรวิชาชีพปีที่ 2", color: "hsl(var(--chart-2))" },
+  { key: "voc_3_total",    roomKey: "voc_3_rooms",    label: "ปวช.3",  full: "ประกาศนียบัตรวิชาชีพปีที่ 3", color: "hsl(var(--chart-2))" },
 ];
 
 const markerIcon = L.icon({
@@ -38,8 +38,72 @@ function buildAddress(school) {
   if (school.district)     parts.push(`อ.${school.district}`);
   if (school.province)     parts.push(`จ.${school.province}`);
   if (school.zip_code)     parts.push(school.zip_code);
-  // ถ้าไม่มีฟิลด์ใหม่เลย ให้ fallback ไปใช้ address เก่า
   return parts.length > 0 ? parts.join(" ") : (school.address || "");
+}
+
+/** สร้าง Google Maps Direction URL (ตั้งเป็นจุดปลายทาง) */
+function getGoogleMapsUrl(lat, lng) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+}
+
+/** Component แสดงตารางรายชั้นปี พร้อมจำนวนห้อง + สรุปรวม */
+function GradeTable({ title, grades, school }) {
+  let totalStudents = 0;
+  let totalRooms = 0;
+
+  const rows = grades.map((g) => {
+    const students = school[g.key] || 0;
+    const rooms = school[g.roomKey] || 0;
+    totalStudents += students;
+    totalRooms += rooms;
+    return { ...g, students, rooms };
+  });
+
+  return (
+    <div>
+      <p className="text-xs font-body font-medium tracking-[0.1em] uppercase text-muted-foreground mb-3">
+        {title}
+      </p>
+      {/* Header */}
+      <div className="flex items-center py-2 border-b-[0.5px] border-foreground/20">
+        <span className="flex-1 font-body text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+          ชั้นปี
+        </span>
+        <span className="w-20 text-right font-body text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+          นักเรียน
+        </span>
+        <span className="w-16 text-right font-body text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+          ห้อง
+        </span>
+      </div>
+      {/* Rows */}
+      {rows.map((r) => (
+        <div key={r.key} className="flex items-center py-3 border-b-[0.5px] border-border">
+          <span className="flex-1 font-body text-sm text-muted-foreground">
+            {r.label} <span className="hidden sm:inline text-xs">({r.full})</span>
+          </span>
+          <span className="w-20 text-right font-body text-sm font-medium tabular-nums text-foreground">
+            {r.students.toLocaleString()}
+          </span>
+          <span className="w-16 text-right font-body text-sm tabular-nums text-muted-foreground">
+            {r.rooms.toLocaleString()}
+          </span>
+        </div>
+      ))}
+      {/* Summary */}
+      <div className="flex items-center py-3 border-t-[1.5px] border-foreground/20">
+        <span className="flex-1 font-body text-sm font-semibold text-foreground">
+          รวม
+        </span>
+        <span className="w-20 text-right font-body text-sm font-bold tabular-nums text-foreground">
+          {totalStudents.toLocaleString()}
+        </span>
+        <span className="w-16 text-right font-body text-sm font-semibold tabular-nums text-foreground">
+          {totalRooms.toLocaleString()}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export default function SchoolDrawer({ school, onClose }) {
@@ -181,25 +245,47 @@ export default function SchoolDrawer({ school, onClose }) {
                 </p>
               </div>
 
-              {/* Minimap */}
+              {/* Minimap — คลิกเปิด Google Maps นำทาง */}
               {hasMap && (
                 <div className="mb-10 pb-10 border-b-[0.5px] border-border">
-                  <p className="text-xs font-body font-medium tracking-[0.1em] uppercase text-muted-foreground mb-4">
-                    <MapPin className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
-                    ตำแหน่งที่ตั้ง
-                  </p>
-                  <div className="rounded-sm overflow-hidden border-[0.5px] border-border h-56 relative z-0">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-body font-medium tracking-[0.1em] uppercase text-muted-foreground">
+                      <MapPin className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                      ตำแหน่งที่ตั้ง
+                    </p>
+                    <a
+                      href={getGoogleMapsUrl(school.latitude, school.longitude)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-body text-accent hover:underline"
+                    >
+                      นำทางด้วย Google Maps
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                  <a
+                    href={getGoogleMapsUrl(school.latitude, school.longitude)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-sm overflow-hidden border-[0.5px] border-border h-56 relative z-0 cursor-pointer group"
+                  >
                     <MapContainer
                       center={[school.latitude, school.longitude]}
                       zoom={15}
                       scrollWheelZoom={false}
-                      className="h-full w-full"
+                      className="h-full w-full pointer-events-none"
                       attributionControl={false}
                     >
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       <Marker position={[school.latitude, school.longitude]} icon={markerIcon} />
                     </MapContainer>
-                  </div>
+                    {/* Overlay on hover */}
+                    <div className="absolute inset-0 bg-accent/0 group-hover:bg-accent/10 transition-colors duration-300 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-card/90 backdrop-blur-sm px-4 py-2 rounded-sm text-xs font-body font-medium text-accent border-[0.5px] border-accent/30">
+                        คลิกเพื่อนำทาง
+                      </span>
+                    </div>
+                  </a>
                 </div>
               )}
 
@@ -241,45 +327,23 @@ export default function SchoolDrawer({ school, onClose }) {
                 </div>
               )}
 
-              {/* Grade breakdown list — ม.ต้น/ม.ปลาย */}
-              <div className="mb-6">
-                <p className="text-xs font-body font-medium tracking-[0.1em] uppercase text-muted-foreground mb-4">
-                  รายละเอียดตามชั้นปี
-                </p>
-                {GRADE_MAP.slice(0, 6).map((g) => (
-                  <div
-                    key={g.key}
-                    className="flex items-center justify-between py-3 border-b-[0.5px] border-border last:border-b-0"
-                  >
-                    <span className="font-body text-sm text-muted-foreground">
-                      {g.full} ({g.label})
-                    </span>
-                    <span className="font-body text-sm font-medium tabular-nums text-foreground">
-                      {(school[g.key] || 0).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
+              {/* Grade breakdown — สายสามัญ ม.1–ม.6 */}
+              <div className="mb-8">
+                <GradeTable
+                  title="รายละเอียดตามชั้นปี (สายสามัญ)"
+                  grades={GRADE_MAP.slice(0, 6)}
+                  school={school}
+                />
               </div>
 
               {/* ปวช. breakdown — แสดงเฉพาะโรงเรียนที่มีข้อมูล */}
               {hasVoc && (
                 <div>
-                  <p className="text-xs font-body font-medium tracking-[0.1em] uppercase text-muted-foreground mb-4">
-                    สายอาชีพ (ปวช.)
-                  </p>
-                  {GRADE_MAP.slice(6).map((g) => (
-                    <div
-                      key={g.key}
-                      className="flex items-center justify-between py-3 border-b-[0.5px] border-border last:border-b-0"
-                    >
-                      <span className="font-body text-sm text-muted-foreground">
-                        {g.full} ({g.label})
-                      </span>
-                      <span className="font-body text-sm font-medium tabular-nums text-foreground">
-                        {(school[g.key] || 0).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
+                  <GradeTable
+                    title="สายอาชีพ (ปวช.)"
+                    grades={GRADE_MAP.slice(6)}
+                    school={school}
+                  />
                 </div>
               )}
             </div>
