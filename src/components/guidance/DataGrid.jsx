@@ -5,12 +5,15 @@ import { ArrowUpDown, ArrowDown, ArrowUp } from "lucide-react";
 const EASE = [0.22, 1, 0.36, 1];
 
 const GRADE_COLS = [
-  { key: "grade_7", label: "ม.1", fullLabel: "มัธยมศึกษาปีที่ 1" },
-  { key: "grade_8", label: "ม.2", fullLabel: "มัธยมศึกษาปีที่ 2" },
-  { key: "grade_9", label: "ม.3", fullLabel: "มัธยมศึกษาปีที่ 3" },
-  { key: "grade_10", label: "ม.4", fullLabel: "มัธยมศึกษาปีที่ 4" },
-  { key: "grade_11", label: "ม.5", fullLabel: "มัธยมศึกษาปีที่ 5" },
-  { key: "grade_12", label: "ม.6", fullLabel: "มัธยมศึกษาปีที่ 6" },
+  { key: "grade_7_total",  label: "ม.1",   fullLabel: "มัธยมศึกษาปีที่ 1" },
+  { key: "grade_8_total",  label: "ม.2",   fullLabel: "มัธยมศึกษาปีที่ 2" },
+  { key: "grade_9_total",  label: "ม.3",   fullLabel: "มัธยมศึกษาปีที่ 3" },
+  { key: "grade_10_total", label: "ม.4",   fullLabel: "มัธยมศึกษาปีที่ 4" },
+  { key: "grade_11_total", label: "ม.5",   fullLabel: "มัธยมศึกษาปีที่ 5" },
+  { key: "grade_12_total", label: "ม.6",   fullLabel: "มัธยมศึกษาปีที่ 6" },
+  { key: "voc_1_total",    label: "ปวช.1", fullLabel: "ประกาศนียบัตรวิชาชีพปีที่ 1" },
+  { key: "voc_2_total",    label: "ปวช.2", fullLabel: "ประกาศนียบัตรวิชาชีพปีที่ 2" },
+  { key: "voc_3_total",    label: "ปวช.3", fullLabel: "ประกาศนียบัตรวิชาชีพปีที่ 3" },
 ];
 
 export default function DataGrid({ schools, onSelectSchool }) {
